@@ -66,5 +66,5 @@ Hack binary instructions are 13-bit values prefixed with `111`.
 
 ## Symbols
 
-- [ ] Symbols support is a work in progress. This will allow for variable names and jump labels.
-
+Jump labels and variable are supported using a hashmap. 
+In the symbol-supported version of the assembler, `.asm` code goes through a 2-pass process. The first pass involves scanning out jump labels. The second pass involves translation to binary, scanning out variables and replacing all symbols with their appropriate memory addresses.
