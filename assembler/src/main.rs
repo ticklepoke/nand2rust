@@ -1,9 +1,12 @@
 use std::env;
 
-use assembler_l::assemble_l;
+use assembler_s::assemble_s;
 
 mod assembler_l;
+mod assembler_s;
 mod instructions;
+mod symbols;
+mod utils;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,11 +15,13 @@ fn main() {
     }
 
     let full_file_path = &args[1];
-    assemble_l(full_file_path);
+    // assemble_l(full_file_path);
+    assemble_s(full_file_path);
 }
 
 #[cfg(test)]
 mod tests {
+    use assembler_l::assemble_l;
     use std::fs::{self, File};
 
     use file_diff::diff_files;
@@ -26,12 +31,18 @@ mod tests {
     #[test]
     fn compare_symbolless_files() {
         let files = vec!["MaxL", "PongL", "RectL"];
-        compare_files(files);
+        compare_files(files, &assemble_l);
     }
 
-    fn compare_files(file_names: Vec<&str>) {
+    #[test]
+    fn compare_symbol_files() {
+        let files = vec!["Max", "Pong", "Rect"];
+        compare_files(files, &assemble_s);
+    }
+
+    fn compare_files(file_names: Vec<&str>, assemble_fn: &dyn Fn(&str)) {
         for file_name in file_names {
-            assemble_l(&format!("./data/{}.asm", file_name));
+            assemble_fn(&format!("./data/{}.asm", file_name));
             let mut generated_file =
                 File::open(format!("./data/{}.hack", file_name)).expect("Unable to open file");
             let mut reference_file =
