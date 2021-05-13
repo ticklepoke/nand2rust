@@ -14,6 +14,7 @@ impl FromStr for FunctionInstruction {
             "function" => Ok(FunctionInstruction::Function),
             "call" => Ok(FunctionInstruction::Call),
             "return" => Ok(FunctionInstruction::Return),
+            _ => Err(()),
         }
     }
 }
