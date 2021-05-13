@@ -47,7 +47,14 @@ impl Parser {
 
     pub fn advance(&mut self) {
         if self.has_more_commands() {
-            let next_line = self.input_lines.next().unwrap().unwrap();
+            let mut next_line: String;
+            loop {
+                next_line = self.input_lines.next().unwrap().unwrap().trim().to_string();
+
+                if !(next_line[0..2].contains("//") || next_line.len() == 0) {
+                    break;
+                }
+            }
             self.curr_line = Some(
                 next_line
                     .split(" ")

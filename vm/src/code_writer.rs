@@ -30,8 +30,18 @@ impl CodeWriter {
 
     pub fn write_arithmetic(&mut self, command: ArithmeticInstruction) {
         let asm_code = match command {
-            _ => "blah",
+            ArithmeticInstruction::Add => [
+                "@SP", "AM=M-1", "D=M", "M=0", "@SP", "AM=M-1", "M=D+M", "@SP", "M=M+1",
+            ],
+            _ => unreachable!(),
         };
+
+        let asm_code = asm_code
+            .iter()
+            .map(|curr| format!("{}\n", curr))
+            .collect::<Vec<String>>()
+            .join("");
+
         write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
