@@ -30,7 +30,7 @@ impl FromStr for ArithmeticInstruction {
             "and" => Ok(ArithmeticInstruction::And),
             "or" => Ok(ArithmeticInstruction::Or),
             "not" => Ok(ArithmeticInstruction::Not),
-            _ => panic!(),
+            _ => Err(()),
         }
     }
 }
