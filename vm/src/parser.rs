@@ -21,11 +21,11 @@ use self::{
     c_instruction::{CArithmetic, CInstruction},
 };
 
-mod arithmetic_instruction;
+pub mod arithmetic_instruction;
 mod c_instruction;
 mod control_instruction;
 mod function_instruction;
-mod memory_instruction;
+pub mod memory_instruction;
 mod memory_segment;
 
 struct Parser {
