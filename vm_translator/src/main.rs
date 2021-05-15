@@ -89,13 +89,17 @@ mod tests {
 
     #[test]
     fn run_emulator() {
-        let files = vec!["./data/SimpleAdd.vm"];
+        let files = vec!["./data/SimpleAdd.vm", "./data/StackTest.vm"];
         for file in files {
             vm_assembler(vec!["", file]);
-            let execution_result = Command::new("./../tools/CPUEmulator.sh")
+            let mut child = Command::new("./../tools/CPUEmulator.sh")
                 .arg(file.replace(".vm", ".tst"))
-                .spawn();
-            assert!(execution_result.is_ok(), "VM Translator failed");
+                .spawn()
+                .unwrap();
+
+            let exit_status = child.wait().unwrap();
+
+            assert!(exit_status.success(), "Test failed: {:?}", file);
         }
     }
 }
