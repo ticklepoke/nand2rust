@@ -6,29 +6,22 @@ use std::{
 };
 
 use crate::{
-    parser::{
-        c_instruction::{CCall, CFunction, CGoto, CIf, CLabel, CPop, CPush, CReturn},
-        control_instruction::ControlInstruction,
-        function_instruction::FunctionInstruction,
-        memory_instruction::MemoryInstruction,
-        memory_segment::MemorySegment,
+    c_instruction::{
+        CArithmetic, CCall, CFunction, CGoto, CIf, CInstruction, CLabel, CPop, CPush, CReturn,
     },
+    memory_instruction::MemoryInstruction,
+    memory_segment::MemorySegment,
+    parser::{control_instruction::ControlInstruction, function_instruction::FunctionInstruction},
     utils::get_input_file,
 };
 
-use self::{
-    arithmetic_instruction::ArithmeticInstruction,
-    c_instruction::{CArithmetic, CInstruction},
-};
+use self::arithmetic_instruction::ArithmeticInstruction;
 
 pub mod arithmetic_instruction;
-mod c_instruction;
 mod control_instruction;
 mod function_instruction;
-pub mod memory_instruction;
-mod memory_segment;
 
-struct Parser {
+pub struct Parser {
     input_lines: Peekable<Lines<BufReader<File>>>,
     curr_line: Option<Vec<String>>,
 }
@@ -39,6 +32,10 @@ impl Parser {
             input_lines: get_input_file(file_path).lines().peekable(),
             curr_line: None,
         }
+    }
+
+    pub fn set_new_file(&mut self, file_path: &str) {
+        self.input_lines = get_input_file(file_path).lines().peekable();
     }
 
     pub fn has_more_commands(&mut self) -> bool {
@@ -61,12 +58,12 @@ impl Parser {
                     .map(|s| s.to_string())
                     .collect::<Vec<String>>(),
             );
+        } else {
+            self.curr_line = None;
         }
-
-        self.curr_line = None;
     }
 
-    pub fn command_type(&self) -> CInstruction {
+    pub fn command_type(&mut self) -> CInstruction {
         if let Some(command) = self.get_nth_word(0) {
             if let Ok(a_instr) = ArithmeticInstruction::from_str(&command) {
                 return CInstruction::CArithmetic(CArithmetic {
@@ -115,6 +112,7 @@ impl Parser {
         }
     }
 
+    // TODO: can remove
     pub fn arg_1(&mut self) -> Option<String> {
         match self.command_type() {
             CInstruction::CArithmetic(instr) => Some(instr.command_type.to_string()),
@@ -126,7 +124,7 @@ impl Parser {
         }
     }
 
-    pub fn arg_2(&self) -> Option<String> {
+    pub fn arg_2(&mut self) -> Option<String> {
         match self.command_type() {
             CInstruction::CPush(_)
             | CInstruction::CPop(_)

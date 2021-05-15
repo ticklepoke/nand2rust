@@ -1,5 +1,5 @@
 [package]
-name = "vm"
+name = "vm_translator"
 version = "0.1.0"
 authors = ["ticklepoke <lee.nigel@hotmail.com>"]
 edition = "2018"

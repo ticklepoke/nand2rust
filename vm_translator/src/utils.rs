@@ -16,7 +16,7 @@ pub fn parse_filepath(args: Vec<&str>) -> &str {
     args[1]
 }
 
-pub fn write_output_file(filename: &str) -> LineWriter<File> {
+pub fn get_output_handle(filename: &str) -> LineWriter<File> {
     let output_file = File::create(filename).expect("Unable to create file");
     let output_file = LineWriter::new(output_file);
     output_file
