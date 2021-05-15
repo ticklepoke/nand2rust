@@ -9,7 +9,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: cd vm && cargo check
+      - run: cd assembler && cargo check
+      - run: cd assembler && cargo test
   vm:
     name: VM Unit Test
     runs-on: ubuntu-latest
@@ -18,4 +19,9 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: cd vm && cargo check
+      - uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "11"
+      - run: cd vm_translator && cargo check
+      - run: cd vm_translator && cargo test
