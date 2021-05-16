@@ -1,6 +1,7 @@
 use std::{
     fs::File,
     io::{LineWriter, Write},
+    vec,
 };
 
 use crate::{
@@ -117,21 +118,9 @@ impl CodeWriter {
         index: usize,
     ) {
         let formatted_index = format!("@{}", index);
-        let formatted_memory_segment = segment.to_string();
         let asm_code = match command {
-            MemoryInstruction::Push => match segment {
-                MemorySegment::Constant => vec![
-                    formatted_index.as_str(),
-                    "D=A",
-                    "@SP",
-                    "A=M",
-                    "M=D",
-                    "@SP",
-                    "M=M+1",
-                ],
-                _ => unimplemented!(),
-            },
-            MemoryInstruction::Pop => unimplemented!(),
+            MemoryInstruction::Push => self.get_push_instr(segment, formatted_index.as_str()),
+            MemoryInstruction::Pop => self.get_pop_instr(segment, formatted_index.as_str()),
         };
 
         let mut asm_code = asm_code.join("\n");
@@ -139,8 +128,64 @@ impl CodeWriter {
         write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
+    fn get_push_instr(&self, segment: MemorySegment, formatted_index: &str) -> Vec<String> {
+        let push_instr = match segment {
+            MemorySegment::Constant => vec![],
+            MemorySegment::Argument => vec!["@ARG", "A=D+M", "D=M"],
+            MemorySegment::Local => vec!["@LCL", "A=D+M", "D=M"],
+            MemorySegment::Static => vec!["@16", "A=D+A", "D=M"],
+            MemorySegment::This => vec!["@THIS", "A=D+M", "D=M"],
+            MemorySegment::That => vec!["@THAT", "A=D+M", "D=M"],
+            MemorySegment::Pointer => vec!["@3", "A=D+A", "D=M"],
+            MemorySegment::Temp => vec!["@5", "A=D+A", "D=M"],
+        };
+
+        let mut instr = vec![formatted_index, "D=A"];
+
+        for s in push_instr {
+            instr.push(s);
+        }
+        // instr.push("D=M");
+        instr.push("@SP");
+        instr.push("A=M");
+        instr.push("M=D");
+        instr.push("@SP");
+        instr.push("M=M+1");
+
+        instr.iter().map(|&s| s.into()).collect()
+    }
+
+    fn get_pop_instr(&self, segment: MemorySegment, formatted_index: &str) -> Vec<String> {
+        let push_instr = match segment {
+            MemorySegment::Argument => vec!["@ARG", "D=D+M"],
+            MemorySegment::Local => vec!["@LCL", "D=D+M"],
+            MemorySegment::Static => vec!["@16", "D=D+A"],
+            MemorySegment::This => vec!["@R3", "D=D+M"],
+            MemorySegment::That => vec!["@R4", "D=D+M"],
+            MemorySegment::Pointer => vec!["@3", "D=D+A"],
+            MemorySegment::Temp => vec!["@5", "D=D+A"],
+            _ => unreachable!(),
+        };
+
+        let mut instr = vec![formatted_index, "D=A"];
+
+        for s in push_instr {
+            instr.push(s);
+        }
+        instr.push("@R5");
+        instr.push("M=D");
+        instr.push("@SP");
+        instr.push("AM=M-1");
+        instr.push("D=M");
+        instr.push("@R5");
+        instr.push("A=M");
+        instr.push("M=D");
+
+        instr.iter().map(|&s| s.into()).collect()
+    }
+
     pub fn close(&mut self) {
-        // write!(self.line_writer, "(END)\n@END\n0;JMP\n").expect("Unable to terminate file");
+        write!(self.line_writer, "(END)\n@END\n0;JMP\n").expect("Unable to terminate file");
         self.line_writer.flush().expect("Unable to close file");
     }
 }

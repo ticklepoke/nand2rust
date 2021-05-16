@@ -21,3 +21,6 @@ AM=M-1
 M=D+M
 @SP
 M=M+1
+(END)
+@END
+0;JMP

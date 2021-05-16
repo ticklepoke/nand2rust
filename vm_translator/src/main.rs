@@ -89,7 +89,13 @@ mod tests {
 
     #[test]
     fn run_emulator() {
-        let files = vec!["./data/SimpleAdd.vm", "./data/StackTest.vm"];
+        let files = vec![
+            "./data/SimpleAdd.vm",
+            "./data/StackTest.vm",
+            "./data/BasicTest.vm",
+            "./data/PointerTest.vm",
+            "./data/StaticTest.vm",
+        ];
         for file in files {
             vm_assembler(vec!["", file]);
             let mut child = Command::new("./../tools/CPUEmulator.sh")
