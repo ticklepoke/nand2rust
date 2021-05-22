@@ -69,6 +69,16 @@ fn vm_assembler(args: Vec<&str>) {
                     p_instr.segment,
                     p_instr.index,
                 ),
+                CInstruction::CLabel(c_instr) => code_writer.write_label(c_instr.label),
+                CInstruction::CGoto(g_instr) => code_writer.write_goto(g_instr.label),
+                CInstruction::CIf(if_instr) => code_writer.write_if(if_instr.label),
+                CInstruction::CCall(c_instr) => {
+                    code_writer.write_call(c_instr.function_name, c_instr.n_locals)
+                }
+                CInstruction::CReturn(_) => code_writer.write_return(),
+                CInstruction::CFunction(f_instr) => {
+                    code_writer.write_function(f_instr.function_name, f_instr.n_locals)
+                }
                 _ => unimplemented!(),
             };
         }

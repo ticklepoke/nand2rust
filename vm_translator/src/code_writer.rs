@@ -184,6 +184,34 @@ impl CodeWriter {
         instr.iter().map(|&s| s.into()).collect()
     }
 
+    pub fn write_init(&self) {
+        unimplemented!()
+    }
+
+    pub fn write_label(&self, label: String) {
+        unimplemented!()
+    }
+
+    pub fn write_goto(&self, label: String) {
+        unimplemented!()
+    }
+
+    pub fn write_if(&self, label: String) {
+        unimplemented!()
+    }
+
+    pub fn write_call(&self, fn_name: String, num_args: usize) {
+        unimplemented!()
+    }
+
+    pub fn write_return(&self) {
+        unimplemented!()
+    }
+
+    pub fn write_function(&self, fn_name: String, num_locals: usize) {
+        unimplemented!()
+    }
+
     pub fn close(&mut self) {
         write!(self.line_writer, "(END)\n@END\n0;JMP\n").expect("Unable to terminate file");
         self.line_writer.flush().expect("Unable to close file");
