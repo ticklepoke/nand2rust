@@ -13,7 +13,7 @@ impl FromStr for ControlInstruction {
         match input {
             "label" => Ok(ControlInstruction::Label),
             "goto" => Ok(ControlInstruction::Goto),
-            "if" => Ok(ControlInstruction::If),
+            "if-goto" => Ok(ControlInstruction::If),
             _ => Err(()),
         }
     }

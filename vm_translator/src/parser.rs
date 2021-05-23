@@ -47,6 +47,7 @@ impl Parser {
             let mut next_line: String;
             loop {
                 next_line = self.input_lines.next().unwrap().unwrap().trim().to_string();
+                next_line = next_line.split("\t").collect::<Vec<&str>>()[0].to_string();
 
                 if !(next_line.len() == 0 || next_line[0..2].contains("//")) {
                     break;

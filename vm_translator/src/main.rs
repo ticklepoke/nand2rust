@@ -105,6 +105,8 @@ mod tests {
             "./data/BasicTest.vm",
             "./data/PointerTest.vm",
             "./data/StaticTest.vm",
+            "./data/BasicLoop.vm",
+            "./data/FibonacciSeries.vm",
         ];
         for file in files {
             vm_assembler(vec!["", file]);

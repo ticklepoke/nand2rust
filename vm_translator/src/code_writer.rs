@@ -188,16 +188,26 @@ impl CodeWriter {
         unimplemented!()
     }
 
-    pub fn write_label(&self, label: String) {
-        unimplemented!()
+    pub fn write_label(&mut self, label: String) {
+        let asm_code = format!("({})\n", label);
+        write!(self.line_writer, "{}", asm_code.as_str()).expect("Unable to write line");
     }
 
-    pub fn write_goto(&self, label: String) {
-        unimplemented!()
+    pub fn write_goto(&mut self, label: String) {
+        let target = format!("@{}\n", label);
+        let asm_code = vec![target.as_str(), "0;JMP\n"];
+
+        write!(self.line_writer, "{}", asm_code.join("")).expect("Unable to write line");
     }
 
-    pub fn write_if(&self, label: String) {
-        unimplemented!()
+    pub fn write_if(&mut self, label: String) {
+        let target = format!("@{}\n", label);
+
+        let asm_code = vec!["@SP", "AM=M-1", "D=M", "M=0", target.as_str(), "D;JNE"];
+        let mut asm_code = asm_code.join("\n");
+        asm_code.push('\n');
+
+        write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
     pub fn write_call(&self, fn_name: String, num_args: usize) {
