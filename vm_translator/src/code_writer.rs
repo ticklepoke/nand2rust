@@ -215,8 +215,69 @@ impl CodeWriter {
         write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
-    pub fn write_call(&self, fn_name: String, num_args: usize) {
-        unimplemented!()
+    pub fn write_call(&mut self, fn_name: String, num_args: usize) {
+        let num_args = format!("@{}", num_args);
+        let fn_target = format!("@RETURN_{}_{}", fn_name, self.jump_count);
+        let fn_label = format!("(RETURN_{}_{})", fn_name, self.jump_count);
+
+        self.jump_count += 1;
+        let asm_code = vec![
+            "@Return_FUNC_X",
+            fn_target.as_str(),
+            "D=A",
+            "@SP",
+            "A=M",
+            "M=D",
+            "@SP",
+            "M=M+1",
+            "@LCL",
+            "D=M",
+            "@SP",
+            "A=M",
+            "M=D",
+            "@SP",
+            "M=M+1",
+            "@ARG",
+            "D=M",
+            "@SP",
+            "A=M",
+            "M=D",
+            "@SP",
+            "M=M+1",
+            "@THIS",
+            "D=M",
+            "@SP",
+            "A=M",
+            "M=D",
+            "@SP",
+            "M=M+1",
+            "@THAT",
+            "D=M",
+            "@SP",
+            "A=M",
+            "M=D",
+            "@SP",
+            "M=M+1",
+            "@SP",
+            "D=M",
+            num_args.as_str(),
+            "D=D-A",
+            "@5",
+            "D=D-A",
+            "@ARG",
+            "M=D",
+            "@SP",
+            "D=M",
+            "@LCL",
+            "M=D",
+            "@_FUNC",
+            "0;JMP",
+            fn_label.as_str(),
+        ];
+
+        let mut asm_code = asm_code.join("\n");
+        asm_code.push_str("\n");
+        write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
     pub fn write_return(&mut self) {

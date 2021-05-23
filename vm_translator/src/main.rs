@@ -31,12 +31,16 @@ fn vm_assembler(args: Vec<&str>) {
         files_to_process.push(file_path.to_string());
         output_file_name = file_path.trim_end_matches(".vm").to_string();
     } else {
-        output_file_name = file_path.clone().to_string();
+        let mut file_split = file_path.clone().split("/").collect::<Vec<&str>>();
+        file_split.push(file_split.last().unwrap());
+        output_file_name = file_split.join("/");
         let paths = read_dir(file_path).unwrap();
         for path in paths {
             if let Ok(dir_entry) = path {
                 let path = dir_entry.path().to_str().unwrap().to_string();
-                files_to_process.push(path);
+                if path.contains(".vm") {
+                    files_to_process.push(path);
+                }
             }
         }
     }
@@ -110,17 +114,31 @@ mod tests {
             "./data/BasicLoop.vm",
             "./data/FibonacciSeries.vm",
             "./data/SimpleFunction.vm",
+            "./data/FibonacciElement",
         ];
         for file in files {
             vm_assembler(vec!["", file]);
+            let mut file_arg;
+            if file.ends_with(".vm") {
+                file_arg = file.replace(".vm", ".tst");
+            } else {
+                let mut file_split = file.clone().split("/").collect::<Vec<&str>>();
+                file_split.push(file_split.last().unwrap());
+                file_arg = file_split.join("/");
+                file_arg.push_str(".tst");
+            }
             let mut child = Command::new("./../tools/CPUEmulator.sh")
-                .arg(file.replace(".vm", ".tst"))
+                .arg(file_arg.as_str())
                 .spawn()
                 .unwrap();
 
             let exit_status = child.wait().unwrap();
 
-            assert!(exit_status.success(), "Test failed: {:?}", file);
+            assert!(
+                exit_status.success(),
+                "Test failed: {:?}",
+                file_arg.as_str()
+            );
         }
     }
 }
