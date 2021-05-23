@@ -184,8 +184,13 @@ impl CodeWriter {
         instr.iter().map(|&s| s.into()).collect()
     }
 
-    pub fn write_init(&self) {
-        unimplemented!()
+    pub fn write_init(&mut self) {
+        let asm_code = vec!["@256", "D=A", "@SP", "M=D"];
+
+        let mut asm_code = asm_code.join("\n");
+        asm_code.push_str("\n");
+
+        write!(self.line_writer, "{}", asm_code.as_str()).expect("Unable to write line");
     }
 
     pub fn write_label(&mut self, label: String) {
@@ -214,12 +219,23 @@ impl CodeWriter {
         unimplemented!()
     }
 
-    pub fn write_return(&self) {
-        unimplemented!()
+    pub fn write_return(&mut self) {
+        let asm_code = vec![
+            "@LCL", "D=M", "@FRAME", "M=D", "@5", "D=D-A", "A=D", "D=M", "@RETURN", "M=D", "@SP",
+            "A=M-1", "D=M", "@ARG", "A=M", "M=D", "@ARG", "D=M", "@SP", "M=D+1", "@FRAME",
+            "AM=M-1", "D=M", "@THAT", "M=D", "@FRAME", "AM=M-1", "D=M", "@THIS", "M=D", "@FRAME",
+            "AM=M-1", "D=M", "@ARG", "M=D", "@FRAME", "AM=M-1", "D=M", "@LCL", "M=D", "@RETURN",
+            "A=M", "0;JMP",
+        ];
+
+        let mut asm_code = asm_code.join("\n");
+        asm_code.push_str("\n");
+        write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
-    pub fn write_function(&self, fn_name: String, num_locals: usize) {
-        unimplemented!()
+    pub fn write_function(&mut self, fn_name: String, num_locals: usize) {
+        let asm_code = format!("({})\n", fn_name);
+        write!(self.line_writer, "{}", asm_code).expect("Unable to write line");
     }
 
     pub fn close(&mut self) {

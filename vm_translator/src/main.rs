@@ -51,6 +51,8 @@ fn vm_assembler(args: Vec<&str>) {
     let mut parser = Parser::new(files_to_process.next().unwrap());
     let mut code_writer = CodeWriter::new(&output_file_name);
 
+    code_writer.write_init();
+
     loop {
         while parser.has_more_commands() {
             parser.advance();
@@ -107,6 +109,7 @@ mod tests {
             "./data/StaticTest.vm",
             "./data/BasicLoop.vm",
             "./data/FibonacciSeries.vm",
+            "./data/SimpleFunction.vm",
         ];
         for file in files {
             vm_assembler(vec!["", file]);

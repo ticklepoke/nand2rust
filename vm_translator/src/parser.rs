@@ -92,17 +92,23 @@ impl Parser {
             }
 
             if let Ok(f_instr) = FunctionInstruction::from_str(&command) {
-                let function_name = self.get_nth_word(1).unwrap();
-                let n_locals = self.get_nth_word(2).unwrap().parse::<usize>().unwrap();
                 return match f_instr {
-                    FunctionInstruction::Function => CInstruction::CFunction(CFunction {
-                        function_name,
-                        n_locals,
-                    }),
-                    FunctionInstruction::Call => CInstruction::CCall(CCall {
-                        function_name,
-                        n_locals,
-                    }),
+                    FunctionInstruction::Function => {
+                        let function_name = self.get_nth_word(1).unwrap();
+                        let n_locals = self.get_nth_word(2).unwrap().parse::<usize>().unwrap();
+                        CInstruction::CFunction(CFunction {
+                            function_name,
+                            n_locals,
+                        })
+                    }
+                    FunctionInstruction::Call => {
+                        let function_name = self.get_nth_word(1).unwrap();
+                        let n_locals = self.get_nth_word(2).unwrap().parse::<usize>().unwrap();
+                        CInstruction::CCall(CCall {
+                            function_name,
+                            n_locals,
+                        })
+                    }
                     FunctionInstruction::Return => CInstruction::CReturn(CReturn {}),
                 };
             }
