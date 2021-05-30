@@ -25,3 +25,17 @@ jobs:
           java-version: "11"
       - run: cd vm_translator && cargo check
       - run: cd vm_translator && cargo test
+  compiler:
+    name: VM Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "11"
+      - run: cd compiler && cargo check
+      - run: cd compiler && cargo test

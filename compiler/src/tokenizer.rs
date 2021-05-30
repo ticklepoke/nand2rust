@@ -41,21 +41,17 @@ impl Tokenizer {
         let mut found_token = None;
         while self.fast < self.tokens.len() && self.slow < self.tokens.len() {
             self.advance_until_different_token();
-            if let Some(token) = self.match_pattern(&self.tokens[self.slow..=self.fast]) {
+            if let Some(token) =
+                self.match_pattern((&self.tokens[self.slow..=self.fast]).to_string().as_str())
+            {
                 found_token = Some(token);
                 self.current_token = Some(found_token.clone().unwrap());
             }
             if found_token.is_some() {
-                // do some matching, return if found, set current_token
-                // TODO: extract value
-
                 self.advance_beyond_whitespace();
                 self.slow = self.fast;
                 return found_token; // return the token
             }
-
-            // Nothing found, continue looking
-            self.fast += 1;
         }
         self.current_token = None;
         None
@@ -79,9 +75,9 @@ impl Tokenizer {
                 TokenType::Symbol => {
                     let token = self.current_token.as_ref().unwrap().value.clone();
                     match token.as_str() {
-                        "<" => String::from("&lt"),
-                        ">" => String::from("&gt"),
-                        "&" => String::from("&amp"),
+                        "<" => String::from("&lt;"),
+                        ">" => String::from("&gt;"),
+                        "&" => String::from("&amp;"),
                         _ => token,
                     }
                 }
@@ -90,10 +86,10 @@ impl Tokenizer {
         unreachable!()
     }
 
-    fn match_pattern(&self, pattern: &str) -> Option<Token> {
+    fn match_pattern(&mut self, pattern: &str) -> Option<Token> {
         if pattern.len() == 1 {
             if let Some(punc) = pattern.chars().next() {
-                if punc.is_ascii_punctuation() {
+                if punc.is_ascii_punctuation() && punc != '"' {
                     return Some(Token::new(TokenType::Symbol, punc.to_string().as_str()));
                 }
             }
@@ -109,13 +105,18 @@ impl Tokenizer {
 
         // String constant
         if pattern.starts_with('"') {
-            if pattern.ends_with('"') {
+            if pattern.len() > 1 && pattern.ends_with('"') {
                 return Some(Token::new(
                     TokenType::StringConst,
                     pattern.trim_matches('"'),
                 ));
             }
-            return None;
+            loop {
+                self.fast += 1;
+                if self.tokens.chars().nth(self.fast).unwrap() == '"' {
+                    return None;
+                }
+            }
         }
 
         // Numeric

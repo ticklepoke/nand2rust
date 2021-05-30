@@ -38,19 +38,54 @@ fn tokenize(args: Vec<&str>) {
 
     for file in files_to_process {
         let mut tokenizer = Tokenizer::new(file.as_str());
-        let mut xml_writer = XMLWriter::new(file.replace(".jack", ".debug.xml").as_str());
+        let mut xml_writer = XMLWriter::new(file.replace(".jack", ".tokenized.xml").as_str());
         tokenizer.advance();
         while tokenizer.current_token.is_some() {
             if let Some(current_token_type) = tokenizer.get_token_type() {
                 let current_token_value = tokenizer.get_value();
-                xml_writer.write_line(
-                    current_token_type.to_string().to_lowercase().as_str(),
-                    current_token_value.as_str(),
-                );
+                let formatted_type = match current_token_type {
+                    token::TokenType::StringConst => String::from("stringConstant"),
+                    token::TokenType::IntConst => String::from("integerConstant"),
+                    _ => current_token_type.to_string().to_lowercase(),
+                };
+                xml_writer.write_line(formatted_type.as_str(), current_token_value.as_str());
             }
             tokenizer.advance();
         }
 
         xml_writer.close();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use crate::tokenize;
+    use std::process::Command;
+
+    #[test]
+    fn run_tokenizer() {
+        let files = vec![
+            "./data/ArrayTest/Main.jack",
+            "./data/ExpressionLessSquare/Main.jack",
+            //"./data/ExpressionLessSquare/Square.jack", // failing
+            "./data/ExpressionLessSquare/SquareGame.jack",
+            "./data/Square/Main.jack",
+            "./data/Square/Square.jack",
+            //"./data/Square/SquareGame.jack", // failing
+        ];
+        for file in files {
+            tokenize(vec!["", file]);
+
+            let mut child = Command::new("./../tools/TextComparer.sh")
+                .arg(file.replace(".jack", ".tokenized.xml"))
+                .arg(file.replace(".jack", "T.xml"))
+                .spawn()
+                .unwrap();
+
+            let exit_status = child.wait().unwrap();
+
+            assert!(exit_status.success(), "Test failed: {:?}", file);
+        }
     }
 }
