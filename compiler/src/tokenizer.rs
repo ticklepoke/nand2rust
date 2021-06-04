@@ -25,6 +25,8 @@ impl Tokenizer {
         let stripped_source = strip_comments(buf_reader);
 
         let mut idx = 0;
+        println!("{:?}", stripped_source.chars().nth(0));
+        println!("{:?}", stripped_source);
         while stripped_source.chars().nth(idx).unwrap().is_whitespace() {
             idx += 1;
         }
@@ -50,7 +52,7 @@ impl Tokenizer {
             if found_token.is_some() {
                 self.advance_beyond_whitespace();
                 self.slow = self.fast;
-                return found_token; // return the token
+                return found_token;
             }
         }
         self.current_token = None;
@@ -127,9 +129,20 @@ impl Tokenizer {
             ));
         }
 
+        // Identifier
         let re_identifier = Regex::new(r"^[a-zA-Z_][a-zA-Z_0-9]*$").unwrap();
         if re_identifier.is_match(pattern) {
             return Some(Token::new(TokenType::Identifier, pattern));
+        }
+
+        // Whitespace
+        if pattern.parse::<char>().unwrap().is_whitespace() {
+            loop {
+                self.fast += 1;
+                if self.fast >= self.tokens.len() {
+                    return None;
+                }
+            }
         }
 
         panic!("Unrecognized Token: {:?}", pattern)

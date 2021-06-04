@@ -12,6 +12,8 @@ pub fn get_input_file(file_path: &str) -> BufReader<File> {
 pub fn strip_comments(buf_reader: BufReader<File>) -> String {
     let mut output_string = String::new();
 
+    let mut is_in_block_comment = false;
+
     for line in buf_reader.lines() {
         if let Ok(line) = line {
             if line.starts_with("//") {
@@ -35,13 +37,11 @@ pub fn strip_comments(buf_reader: BufReader<File>) -> String {
                     output_string.push_str(token);
                 }
             } else if line.contains("/*") {
-                let split_code = line
-                    .split("/*")
-                    .collect::<Vec<&str>>()
-                    .first()
-                    .unwrap()
-                    .to_owned();
-                output_string.push_str(split_code);
+                is_in_block_comment = true;
+            } else if line.contains("*/") {
+                is_in_block_comment = false;
+            } else if is_in_block_comment {
+                continue;
             } else {
                 output_string.push_str(line.as_str());
             }

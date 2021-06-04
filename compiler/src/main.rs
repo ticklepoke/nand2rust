@@ -68,11 +68,11 @@ mod tests {
         let files = vec![
             "./data/ArrayTest/Main.jack",
             "./data/ExpressionLessSquare/Main.jack",
-            "./data/ExpressionLessSquare/Square.jack", // failing
+            "./data/ExpressionLessSquare/Square.jack",
             "./data/ExpressionLessSquare/SquareGame.jack",
             "./data/Square/Main.jack",
             "./data/Square/Square.jack",
-            "./data/Square/SquareGame.jack", // failing
+            "./data/Square/SquareGame.jack",
         ];
         for file in files {
             tokenize(vec!["", file]);
